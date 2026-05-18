@@ -1,0 +1,48 @@
+name: Build VCAMTINHBER
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app/Contents/Developer | head -n 1)"
+          xcodebuild -version
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          brew install ldid xz
+
+      - name: Install roothide Theos and iOS SDK
+        run: |
+          set -euo pipefail
+          export THEOS="$HOME/theos"
+          rm -rf "$THEOS"
+          git clone --recursive https://github.com/roothide/theos.git "$THEOS"
+          mkdir -p "$THEOS/sdks"
+          curl -fL "https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS16.5.sdk.tar.xz" | tar -xJ -C "$THEOS/sdks"
+
+      - name: Build package
+        run: |
+          set -euo pipefail
+          export THEOS="$HOME/theos"
+          make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: VCAMCUATINH
+          path: packages/*.deb
+          if-no-files-found: error
