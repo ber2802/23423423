@@ -1,0 +1,9 @@
+Package: com.facebook.letinh.info
+Name: VCAMTINHBER
+Version: 0.0.1
+Architecture: iphoneos-arm64e
+Description: VCAM4iOS
+Maintainer: tinhber
+Author: tinhber
+Section: Tweaks
+Depends: mobilesubstrate, firmware (>= 15.0)
